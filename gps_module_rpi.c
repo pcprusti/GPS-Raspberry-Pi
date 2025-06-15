@@ -8,12 +8,15 @@
 #include <termios.h> // Contains POSIX terminal control definitions
 #include <unistd.h> // write(), read(), close()
 
-char latitute[15] = {'\0'};
+char latitude[15] = {'\0'};
 char lat_dir[2] = {'\0'};
-char longitute[15] = {'\0'};
+char longitude[15] = {'\0'};
 char lon_dir[2] = {'\0'};
 
-int main() {
+int main() 
+{
+  // Allocate memory for read buffer, set size according to your needs
+  char read_buf [256];	
   // Open the serial port. Change device path as needed (currently set to an standard FTDI USB-UART cable type device)
   int serial_port = open("/dev/ttyACM0", O_RDWR);
 
@@ -59,18 +62,13 @@ int main() {
       return 1;
   }
 
-  // Allocate memory for read buffer, set size according to your needs
-  char read_buf [256];
+  
   while(1)
   {
-  // Normally you wouldn't do this memset() call, but since we will just receive
-  // ASCII data for this example, we'll set everything to 0 so we can
-  // call printf() easily.
+  //  set everything to 0 so we can
   memset(&read_buf, '\0', sizeof(read_buf));
 
   // Read bytes. The behaviour of read() (e.g. does it block?,
-  // how long does it block for?) depends on the configuration
-  // settings above, specifically VMIN and VTIME
   int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
   //memcpy(read_buf, "$GPGLL,5109.0262317,N,11401.8407304,W,202725.00,A,D*79", sizeof("$GPGLL,5109.0262317,N,11401.8407304,W,202725.00,A,D*79"));
   //int num_bytes = sizeof(read_buf);
@@ -80,14 +78,11 @@ int main() {
       return 1;
   }
 
-  // Here we assume we received ASCII data, but you might be sending raw bytes (in that case, don't try and
-  // print it to the screen like this!)
+  // Here we assume we received ASCII data
   //printf("Read %i bytes. Received message: %s", num_bytes, read_buf);
   int value = strncmp(read_buf, "$GPGLL", 6);
-  if (!value)
-  //if ((!value) && (strlen(read_buf) > 20))  
+  if (!value)  
   {
-        //cout << "The first 5 characters are same.";
         printf("Read %i bytes. Received message: %s", num_bytes, read_buf);
         char* token = strtok(read_buf, ",");
         char i =0;
@@ -103,8 +98,8 @@ int main() {
              {
 		     if(i == 1)
 		     {
-		        memcpy(latitute, token, sizeof(token));
-		        printf("\nlatitute %s\n", latitute);
+		        memcpy(latitude, token, sizeof(token));
+		        printf("\nlatitude %s\n", latitude);
 		     }
 		     
 		     if(i == 2)
@@ -115,8 +110,8 @@ int main() {
 		     
 		     if(i == 3)
 		     {
-		        memcpy(longitute, token, sizeof(token));
-		        printf("longitute %s\n", longitute);
+		        memcpy(longitude, token, sizeof(token));
+		        printf("longitude %s\n", longitude);
 		     }
 		     
 		     if(i == 4)
